@@ -15,9 +15,6 @@ class AuthRequest(BaseModel):
 class AuthenticatedUser(BaseModel):
     token: str
 
-class RegisterResponse(BaseModel):
-    success: bool
-
 class WishRequest(BaseModel):
     text: str = Field(min_length=1)
 
@@ -160,14 +157,14 @@ def login(payload: AuthRequest):
     return AuthenticatedUser(token=token)
 
 
-@app.post("/register", response_model=RegisterResponse)
+@app.post("/register")
 def register(payload: AuthRequest):
     if payload.email in USERS:
         raise HTTPException(status_code=409, detail="Email already registered")
 
     USERS[payload.email] = payload.password
     ROLES[payload.email] = Role.User
-    return RegisterResponse(success=True)
+    return {"success": True}
 
 
 @app.get("/current-track", response_model=CurrentTrack)
